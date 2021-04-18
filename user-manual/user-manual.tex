@@ -1,0 +1,731 @@
+\documentclass[letterpaper,12pt]{report}
+\usepackage{float}
+\usepackage[top=0.7in, bottom=0.7in, left=0.75in, right=0.75in,headsep=0.2in,footskip=0.3in,portrait]{geometry}
+\usepackage[ascii]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{array}
+\usepackage{hhline}
+\usepackage{hyphenat}
+\usepackage{makeidx}
+\makeindex
+\usepackage[bookmarksopen,bookmarksopenlevel=2,bookmarksnumbered]{hyperref}
+\usepackage{fancyvrb}
+\hypersetup{pdftex, colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue, pdftitle=CMfinder user manual}
+\usepackage[pdftex]{graphicx}
+%\newcommand\textsubscript[1]{\ensuremath{{}_{\text{#1}}}}
+% Footnote rule
+\setlength{\skip\footins}{0.0469in}
+\renewcommand\footnoterule{\vspace*{-0.0071in}\setlength\leftskip{0pt}\setlength\rightskip{0pt plus 1fil}\noindent\textcolor{black}{\rule{0.25\columnwidth}{0.0071in}}\vspace*{0.0398in}}
+\newcommand{\comment}[1]{}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\newcommand{\fig}[4]{
+\begin{figure}
+\includegraphics{#2}
+\caption{#3}
+
+\begin{small}
+#4
+\end{small}
+\label{#1}
+\end{figure}
+}
+\newcommand{\example}[1]{
+\begin{quote}
+{\raggedright
+#1
+}
+\end{quote}
+}
+\newcommand{\examplett}[1]{
+\example{{\tt #1}}
+}
+\begin{document}
+\newcommand{\myversion}[0]{0.4.1.18}
+%\lhead{}\chead{}\rhead{}\lfoot{CMfinder version \myversion{} user manual}\cfoot{}\rfoot{\thepage}\renewcommand{\headrulewidth}{0pt}\pagestyle{fancy}
+\floatstyle{ruled}
+\restylefloat{figure}
+\pagestyle{plain}
+\newcommand{\PackageName}[0]{CMfinder package}
+\begin{titlepage}
+%\vskip 3em
+\begin{center}
+\begin{huge}
+\noindent{}\PackageName{} \myversion{} user manual\\
+\end{huge}
+\vskip 0.5em
+\begin{Large}
+Software for inferring and scoring RNA secondary structure
+\end{Large}
+\vskip 1em
+\begin{large}
+Zasha Weinberg\\(with lots of code by Zizhen Yao, Eric Nawrocki and others)
+\end{large}
+\vskip 1em
+\today
+\vskip 4em
+\end{center}
+
+\vfill
+Copyright \copyright{} 2012-\the\year{} by Zasha Weinberg.  All rights reserved.
+
+This software package, including source code and this manual, is distributed freely but without any warranty
+under the terms of the GNU General Public License version 3 or later as published by the Free Software
+Foundation.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+For a copy of the full text of the GNU General Public License, see \url{www.gnu.org/licenses}.
+\vskip 2em
+
+This package includes the following material from other sources (see COPYRIGHT files in the subdirectories for details; only the primary authors are given here):
+\begin{itemize}
+\item CMfinder version 0.3 \cite{yao:cmfinder} by Zizhen Yao (which included the cmfinder and pscore programs, and various related data files and Perl scripts)
+\item Infernal version 0.72 (\url{http://infernal.janelia.org}) by Sean Eddy and others
+\item Infernal version 1.1 (\url{http://infernal.janelia.org}) by Erik Nawrocki, Sean Eddy and others
+\item Vienna RNA versions 1.4 and 1.7 (\url{http://www.tbi.univie.ac.at/RNA/}) by Ivo Hofacker, Peter Stadler, Sebastian Bonhoeffer and others
+\item Pfold \cite{pfold} by Bjarne Knudsen (Thanks to Zsuzsanna S{\"u}k{\"o}sd for retrieving source code)
+\item CLUSTALW \cite{CLUSTALW} version 1.83 (no author credits given)
+\item QRNA \cite{RivasAndEddy} by Elena Rivas and Sean Eddy
+\item {\sc RaveNnA} by Zasha Weinberg \cite{zashaRECOMB,zashaISMB,zasha06} is the source of much of the code for {\tt hmmpair}.
+\end{itemize}
+\end{titlepage}
+
+\clearpage\setcounter{page}{1}
+
+
+\setcounter{tocdepth}{3}
+\renewcommand\contentsname{}
+\tableofcontents
+
+\chapter{Introduction}
+
+\section{What does this software do?}
+
+This software provides three main programs:
+\begin{itemize}
+\item CMfinder. CMfinder is designed to predict an alignment and RNA secondary structure of multiple unaligned sequences, and is described in a paper \cite{yao:cmfinder}.
+\item RNAphylo (also called ``pscore''). RNAphylo is designed to score an alignment based on how much evidence it contains of the presence of a conserved RNA.  It is described in Zizhen Yao's Ph.D. dissertation \cite{ZizhenThesis}.
+\item hmmpair.  Hmmpair is an alternate method to score alignments, which attempts to evaluate how much support there is in conserved sequences for aligning covarying base pairs. It uses profile HMMs to evaluate conservation.
+Hmmpair is described in a paper by Zasha Weinberg \cite{MotifsTwoTwoFour}.
+\end{itemize}
+
+This software extends CMfinder version 0.3, which was written by Zizhen Yao.
+
+\subsection{How is this version 0.4 different from version 0.3?}
+
+The main changes are that CMfinder and RNAphylo are extended to allow for sequences in which an RNA is truncated.  This situation frequently arises in metagenome sequences, and in the previous version of CMfinder creates problem in motif detection and scoring.  Sequence truncation was not a significant issue when previous versions of CMfinder were developed, mainly because less metagenomic data was available.
+
+The hmmpair method was not a part of version 0.3.
+
+This new version of CMfinder does not implement some functionity in CMfinder 0.3, and therefore the old CMfinder 0.3 is provided (called {\tt cmfinder}) as well as the updated version 0.4.  Only one version of RNAphylo is provided.
+
+CMfinder 0.4 is different from version 0.3 as follows:
+\begin{itemize}
+\item Alignments are robust to input sequences in which the RNA structure has been truncated, with appropriate command-line flags.  
+CMfinder 0.4 deals with truncation case by using the truncation-aware alignment functions in Infernal 1.1, and by adjusting the mutual information and other calculations within CMfinder.  Only truncations caused by limited contig assembly is supported.  By contrast, biological causes of truncations (e.g., transposon insertion) are not supported.  Basically, truncations can only occur at the end of a contig, never in the middle.
+\item CM functions are based on Infernal 1.1, rather than the pre-1.0 version of CMfinder 0.3.
+\item Degenerate nucleotides are dealt with better, by marginalizing over the possibilities in some contexts and ignoring the degenerate nucleotides (so they don't impact the calculations) where possible.
+\item Other experimental or minor features.
+\item CMfinder 0.4 does {\em not} implement functionality to deal with long input sequences (e.g. anchors) that CMfinder 0.3 implemented to help with eukaryotic sequences.
+\end{itemize}
+
+The updated RNAphylo provides the following new features compared to the CMfinder 0.3 package:
+\begin{itemize}
+\item Scoring is robust to input sequences in which the RNA structure has been truncated.  The nucleotides missing due to trunctation are treated as not being a part of the alignment, so they do not contribute to the score.  (The obvious solution would be marginalize over the possible nucleotides, but this can bias the score by unfairly considering non-pairing nucleotides as likely---it's safer to just ignore the missing nucleotides.)  For subtle reasons, enabling this functionality requires restricting the scoring to a specific consensus secondary structure provided by the user, rather than considering all possible secondary structures.
+\item Degenerate nucleotides are also treated as being not part of the alignment, except for invocation of RNAfold as part of partition function calculations.
+\item The program is faster and takes less memory because it caches expensive phylogenetic tree calculations.  However, the speed-up is only significant in practice for relatively large alignments with the truncation-aware scoring; typical calculations that were performed with the previous version of RNAphylo were already fast enough.
+\item Other experimental or minor features.
+\end{itemize}
+
+Additionally there are some changes to Infernal 1.1 to allow for CMs that are only calibrated (with {\tt cmcalibrate}) for certain search modes.  This modification can save time when the calibration time is significant compared to the search time.  The implemention of this feature adds the flag {\tt -{}-partial} {\it code} to the {\tt cmcalibrate} command.  {\it code} = {\tt lc} means local CYK only, {\tt gc} means glocal CYK only, {\tt li} means local inside only, {\tt gi} means glocal inside only, {\tt hmm} means hmmonly search.  Searches will abort with an error if the search requires an un-calibrated mode.
+
+\subsection{Changes since version 0.4}
+
+\begin{itemize}
+%\item Version \myversion{}:
+%\begin{itemize}
+%\item stuff
+%\end{itemize}
+\item Version \myversion{}:
+\begin{itemize}
+\item Minor bug fixes / detecting problematic input.
+\end{itemize}
+\item Version 0.4.1.15:
+\begin{itemize}
+\item Minor bug fixes.
+\item fixed problem in {\tt candf} program that causes it to crash with large input sequences.
+  \item Added citation of paper describing this package in comparison to CMfinder version 0.3 \cite{MotifsTwoTwoFour}.
+\end{itemize}
+\item Version 0.4.1.9
+\begin{itemize}
+\item Added {\tt hmmpair} program, which implements an alternate alignment scoring method.
+\item Added {\tt ScoreMotif.pl} script, which produces a score combining {\tt RNAphylo} and {\tt hmmpair}.
+\item Other minor changes.
+\end{itemize}
+\item Version 0.4.0.35:
+\begin{itemize}
+\item First version of version 0.4 to be publically released.
+\end{itemize}
+\end{itemize}
+
+\subsection{Components of this software}
+
+The main components of this package are:
+\begin{itemize}
+\item {\tt cmfinder.pl} : Perl script from version 0.3 of the package to predict a set of possible multiple-sequence alignments from unaligned sequences.
+\item {\tt cmfinder04.pl} : Analogous to cmfinder.pl, but uses cmfinder04, the updated version of the program.
+\item {\tt cmfinder} : C program that optimizes an alignment.  This is the major component used by the {\tt cmfinder.pl} script, and is specific to CMfinder version 0.3.
+\item {\tt cmfinder04} : Same purpose as {\tt cmfinder}, but with some new features.
+\item {\tt RNAphylo} (previously called {\tt pscore}) : a program to score an alignment based on evidence of conservation of a given secondary structure.  A phylogenetic model is used.
+\item {\tt hmmpair} : a program implementing a different approach to scoring alignments for conservation of secondary structure.
+\item {\tt ScoreMotif.pl} : scores alignments for evidence of RNA structure using a combination of {\tt RNAphylo} and {\tt hmmpair}.
+\end{itemize}
+
+\section{Which version of CMfinder should I use?}
+
+In general, {\tt cmfinder04.pl}/{\tt cmfinder04} is better for bacterial or archaeal sequences, whose non-coding sequences are typically not long, and which sometimes have truncations within incomplete genomes.  {\tt cmfinder04} is especially important for metagenome sequences, where truncations are frequent.
+
+For eukaryotic sequences, which will often be quite long, {\tt cmfinder.pl}/{\tt cmfinder} is likely to be better.
+
+\section{Credit}
+
+If you use CMfinder or RNAphylo, please cite Zizhen Yao's paper in {\it Bioinformatics} \cite{yao:cmfinder}, her Ph.D. dissertation \cite{ZizhenThesis} and/or this manual.
+
+If you use hmmpair or specifically use the truncation-aware functionality, please cite the relevant paper by Zasha Weinberg \cite{MotifsTwoTwoFour} and/or this manual.
+
+CMfinder 0.3 was conceived and written by Zizhen Yao while working on her Ph.D. with Larry Ruzzo.  CMfinder version 0.4 is derived from this code base, and the modifications were made by Zasha Weinberg.  This software package also makes extensive use of other software packages that are listed on the title page of this manual.
+
+\section{Licensing}
+
+The entire package is distributed freely but without any warranty whatsoever
+under the GNU General Public License.
+For details, see \url{http://www.gnu.org/licenses}.
+
+Details on copyrights covering parts of this software are given in the {\tt COPYRIGHT} files in the various subdirectories.
+
+\chapter{Installation}
+\label{sec:install}
+
+Installation means compiling \& linking executable files.  There is no actual installation (like to {\tt /usr/local}).
+
+\section{Building the package}
+
+Summary:
+Unpack the {\tt .tgz} file and get into its root directory.  Then run:
+\begin{quote}
+{\tt ./configure}\\
+{\tt make}
+\end{quote}
+
+(There is no {\tt make install}, you just run programs from the build locations.  Perl scripts are in the {\tt bin} subdirectory, and symbolic links to executables are also in this directory.)
+
+\subsection{options to configure}
+
+The {\tt configure} script is an adaptation of the configure script for Infernal 1.1rc2.  The {\tt -{}-enable-mpi} flag has been removed, and some flags might not work properly in the \PackageName.  Also, since there's no {\tt make install} procedure, none of the flags relating to the installation directories will have any effect.
+
+Flags that have been tested are:
+\begin{itemize}
+\item {\tt --enable-debugging} / {\tt --disable-debugging} (Will pass the flags {\tt -O0 -g -Wall} to gcc)
+\item {\tt --enable-threads} / {\tt --disable-threads}  (But note that only the {\tt cmfinder04} executable has any multithreading capabilities; the other programs will completely ignore threading.)
+\item The environment variables listed at the end of the output of {\tt ./configure --help} should work.
+\end{itemize}
+
+\section{Environment variables}
+
+If you wish to run {\tt cmfinder} or {\tt cmfinder.pl}, you will most likely need to do the following:
+\begin{itemize}
+\item Set environment variable {\tt CMfinder} to the root directory of the un-packed files.
+\item Make sure that the command {\tt clustalw} is in {\tt PATH}
+\item Add the {\tt bin} subdirectory to {\tt PATH}
+\end{itemize} 
+
+If you want to use ClustalW with {\tt cmfinder04.pl} (which is not necessary), you'll need to make sure {\tt clustalw} is in {\tt PATH}.
+
+\section{Platforms on which the \PackageName{} is known to work}
+
+Building has only been tested with the gcc compiler suite (\url{http://gcc.gnu.org}).  To ensure compatibility, you will need the GNU C compiler (which provides the {\tt gcc} command).  The software is unlikely to work on a non-gcc compiler without modification.
+
+The software has been tested on the following platforms:
+\begin{itemize}
+\item gcc version 4.5.3 under Cygwin 1.7.17 (32-bit) on Windows 7.
+\item gcc version 4.4.6 under Red Hat Linux 6.3 running Linux kernel 2.6.32 (64-bit).
+\end{itemize}
+
+I presume that this software will work on gcc version 4 or higher on any UNIX system.  For Windows, you'll probably want to install Cygwin (\url{www.cygwin.com}), and be sure to install development tools like gcc and make (which are not installed by default).  For MacOSX, you can use Darwin, but you'll need to install Xcode to get gcc and make.
+
+\section{Known issues with installation}
+
+If you get an error in {\tt impl\_ssl.h} like ``{\tt unknown type name `FM\_METADATA'}'', you might have include files from Infernal or HMMER already in the include path.  Check what was in your CFLAGS or CPPFLAGS environment variables when you ran {\tt ./configure}.
+
+\chapter{Programs from CMfinder version 0.3}
+
+The following is derived from the {\tt README} file from the CMfinder version 0.3 distribution.  It covers only the {\tt cmfinder.pl} Perl script, the alignment optimizing program {\tt cmfinder} and some minor helper programs.
+
+The perl script mentioned ({\tt cmfinder.pl}) is found in the {\tt bin} subdirectory.  The executable files are found in the {\tt cmfinder03} directory (once they are built in the installation process), and symbolic links to them are in the {\tt bin} directory.
+
+\section{Usage}
+
+\subsection{Typical usage: the Perl script}
+\label{cmfinder.pl}
+
+A Perl script is provided that predicts a set of alignments with a secondary structure, given a set of unaligned sequences. This Perl script is called {\tt cmfinder.pl} (in the {\tt bin} subdirectory).  The command line is:
+
+\begin{quote}
+{\tt cmfinder.pl} {\it [options]} {\it seq-file}
+\end{quote}
+
+The file {\it seq-file} must contain a list of sequences in FASTA format.
+
+Zero or more output files are created that correspond to different possible alignments from the input sequences.
+The output motifs are named like {\it seq-file}{\tt .motif.}{\it suffix} where the {\it suffix} indicates the number of stem-loops used
+in the motif, and the motif order. For example, {\it seq-file}{\tt .motif.h2\_1} is the first double stem-loop motif. 
+The corresponding covariance model file is named in the the same way, such as {\tt seq-file.cm.h2\_1}.
+
+Motifs can be combined (when the {\tt -combine} flag is given), and the name of a combined motif is based on the names of the elementary motifs used.  For example, {\it seq-file}{\tt .motif.h2\_1.h1\_4} corresponds to the combination of the first double stem-loop motif with the fourth single stem-loop motif.
+
+For most applications, you can simply use the default configuration, which includes combining simple motifs:
+\begin{quote}
+{\tt cmfinder.pl --def} {\it seq-file}
+\end{quote}
+
+More detailed options and arguments are explained below.
+
+\subsubsection{Input sequence file}
+
+The input sequence file ({\it seq-file}) must be in FASTA format.
+
+\subsubsection{Number of candidates}
+
+\begin{quote}
+{\tt -s1} {\it number-of-candidates-with-1-stem-loop}
+\end{quote}
+By default 5 candidate alignments are predicted with one stem loop.  Larger input sequences might benefit from more predictions.
+
+\begin{quote}
+{\tt -s2} {\it number-of-candidates-with-2-stem-loops}
+\end{quote}
+Same thing, for candidate alignments with two stem loops.
+
+\subsubsection{Minimum/maximum motif length}
+
+\begin{quote}
+{\tt -m1} {\it min-motif-length-with-1-stem-loop}
+\end{quote}
+\begin{quote}
+{\tt -M1} {\it max-motif-legth-with-1-stem-loop}
+\end{quote}
+\begin{quote}
+{\tt -m2} {\it min-motif-length-with-2-stem-loops}
+\end{quote}
+\begin{quote}
+{\tt -M2} {\it max-motif-legth-with-2-stem-loops}
+\end{quote}
+
+The lower bound of motif length is 15 bp, and the upper bound is 250 bp. 
+The actual output motifs can be slightly outside the specified range, 
+because we do not enforce the range during refinement iteration. 
+Different values are used for motifs with one or two stem loops.
+
+\subsubsection{Fraction of sequences containing the motif}
+
+\begin{quote}
+{\tt -f} {\it fraction}
+\end{quote}
+
+If it is expected that only a small fraction of sequences actually contain the motif, 
+you can set the fraction to a small value (say 0.3) to affect its behavior. 
+Usually, this parameter does not affect the performance much, if the embedded RNA structure is significant.
+
+\subsection{Components of CMfinder}
+
+CMfinder version 0.3 has 4 main components written as C programs: {\tt candf} for searching candidates, {\tt cands} for candidates comparison, {\tt canda}
+for aligning similar candidates and {\tt cmfinder} for EM refinement. 
+
+\subsubsection{candf}
+
+This program takes a FASTA format sequence file as input, and outputs a list of candidate motif 
+instances for each sequence. A user can specify the number of candidates, the minimum and maximum length of 
+the motif, and the number of stem-loops in the motif. The energy function computation is based on the Vienna software package.
+
+\subsubsection{cands}
+
+This program performs pairwise candidate comparison using a tree-edit algorithm, i.e., using the {\tt treedist} 
+function in the Vienna software package. Then it selects at most one candidate from each sequence such that the sum of their pairwise 
+distances are relatively small. 
+These candidates are then aligned by {\tt canda} to create a seed alignment for EM refinement.
+A user can use {\tt -n} option to specify the multiple sets of candidates as seeds for EM.
+While we allow overlap between different seeds, we want them to be as different as possible.
+The {\tt -f} fraction option helps to eliminate unlikely candidates from seed alignment. 
+A user can also provide a {\it match-constraint-file} to specify the anchor points for alignment,
+that only the candidates that are consistent with the anchors are compared.
+These anchors are computed using BLAST.
+
+\subsubsection{canda}
+
+{\tt canda} aligns all the candidates in the seed to a consensus candidate to create a seed alignment. 
+
+\subsubsection{cmfinder}
+\label{cmfinder03}
+
+{\tt cmfinder} performs EM refinement of a given alignment. The basic CM operations, i.e. CM alignment,
+model construction, parameterization are based on Infernal 0.7. The usage of {\tt cmfinder} is:
+
+\begin{quote}
+{\tt cmfinder} {\it [options] seq-file output-cmfile}
+\end{quote}
+where
+\begin{itemize}
+\item {\it seq-file} are sequences in FASTA format, and
+\item {\it output-cmfile} will contain the output covariance model. 
+\end{itemize}
+
+\noindent
+The main options are:
+\begin{itemize}
+\item {\tt -a} {\it align-file} :  the initial (seed) motif alignment.
+  The alignment must be in Stockholm format by default. You can also use the 
+  {\tt -{}-format} option to use an alignment in another format (e.g. ClustalW format).
+  In typical usage, this alignment is produced by {\tt canda} (see above), but it can be obtained from
+  other sources, such as ClustalW alignment. 
+  {\it cmfinder} does not use the secondary structure of the input alignment, so it is not necessary. 
+\item {\tt -i} {\it cmfile} : the initial covariance model.
+  You must specify either an alignment (with {\tt -a}), or a covariance model (with {\tt -i}) as input.
+\item {\tt -o} {\it align-file} : the output motif structural alignment in Stockholm format. 
+  If no output alignment filename is provided, the alignment will be printed to standard output.
+\item {\tt -c} {\it candidate-file} : the candidate file.
+
+CMfinder was originally designed as a two-phase process: first we only iterate among candidates 
+  found by {\tt candf}, then in the second phase, the CM model is used to scan the whole sequence to 
+  identify new candidates. In practice, however, the seed alignment is good enough to scan the 
+  sequence directly. So, by default, the first phase is skipped, unless the user explicitly 
+  provides the {\it candidate-file}. 
+\end{itemize}
+
+\subsection{Postprocessing of motifs}
+
+\subsubsection{Combining motifs}
+
+Initially, {\tt cmfinder.pl} predicts simple motifs with only one or two stem loops.  For later processing, there is a heuristic process to 
+combine multiple simple motifs into large structures. These heuristics are implemented in the {\tt comb\_motif.pl} script.  The {\tt cmfinder.pl} script invokes this script itself when run with the {\tt -combine} flag; there is normally no need to run {\tt comb\_motif.pl} directly.
+
+The usage is the following:
+
+\begin{quote}
+{\tt comb\_motif.pl} {\it seq-file motif1 motif2 ...}
+\end{quote}
+
+If all the motif files share the common prefix, you only need to use the prefix.
+
+\subsubsection{Summarize motif features and statistics}
+
+CMfinder can output multiple motifs, and it is not always clear how to select the best one. 
+The {\tt summarize} program calculates a variety of statistics that can be useful to ranking motifs, according to a formula proposed by Zizhen Yao \cite{ZizhenThesis}.  A method was also developed to select the best up-to-four motifs (\url{http://bio.cs.washington.edu/supplements/yzizhen/pipeline/}).  These methods are useful for automated prediction of novel RNAs.  When the goal is to predict possible structures of a given set of sequences, it is probably best to look at all or many of the predicted alignments.
+
+\chapter{CMfinder version 0.4}
+
+This chapter explains CMfinder programs specific to version 0.4.  In comparison to CMfinder version 0.3 (see previous chapter), the only differences are modifications in the {\tt cmfinder04} executable and the {\tt cmfinder04.pl} Perl script.  For all other programs, the version 0.3 program is used.
+
+The {\tt cmfinder04.pl} Perl script is found in the {\tt bin} subdirectory.  The {\tt cmfinder04} executable is found in the {\tt cmfinder04} subdirectory.  A symbolic link to {\tt cmfinder04} is in the {\tt bin} subdirectory.  The modified version of the {\tt summarize} program is accessed by running {\tt cmfinder04} with the {\tt -{}-summarize} flag.
+
+\section{The cmfinder04.pl Perl script}
+
+The Perl script {\tt cmfinder04.pl} has an identical purpose to the {\tt cmfinder.pl} script from CMfinder version 0.3 (see section~\ref{cmfinder.pl}).  It predicts a set of alignments, each with a consensus secondary structure, given unaligned sequences as input.  The main difference is that it uses the updated {\tt cmfinder04} executable (see below).
+
+The command line is:
+\begin{quote}
+{\tt cmfinder04.pl} {\it [options]} {\it seq-file}
+\end{quote}
+where {\it seq-file} is a list of sequences in FASTA format.
+
+A brief description of the various options can be obtained by running
+\begin{quote}
+{\tt cmfinder04.pl -h}
+\end{quote}
+
+The following command line is recommended in general for finding new motifs.  It is not, however, based on any careful study:
+\begin{quote}
+{\tt cmfinder04 -skipClustalW -minCandScoreInFinal 10 -combine -fragmentary\\ -commaSepEmFlags x-{}-filter-non-frag,-{}-max-degen-per-hit,2,-{}-max-degen-flanking-nucs,\\7,-{}-degen-keep,-{}-amaa} {\it seq-file}
+\end{quote}
+(There should be a space before {\tt -commaSepEmFlags}, but not before {\tt 7}.)
+
+The most significant options are:
+\begin{itemize}
+\item {\tt -fragmentary} : enables handling of fragmentary RNAs within the alignments.  Without this option, {\tt cmfinder04} will behave poorly (like version 0.3) with fragmented RNAs.
+\item {\tt -combine} : attempt to combine simple motifs in order to possibly make a prediction with a more complex structure.  {\tt cmfinder04.pl} should generally be run with this option.
+\item {\tt -s1} {\it number} : maximum number of single-hairpin motifs to generate.  This number can be increased if the input sequences are large, or if a structure with many stems is expected.
+\item {\tt -s2} {\it number} : maximum number of two-hairpin motifs to generate.  This number can be increased if the input sequences are large, or if a structure with many stems is expected.
+\item {\tt -minspan1} {\it number} : set the minimum span for single-hairpin motifs.
+\item {\tt -maxspan1} {\it number} : set the maximum...
+\item {\tt -minspan2} {\it number} : as above, for double-hairpin motifs
+\item {\tt -maxspan2} {\it number} : as above, for double-hairpin motifs
+\item {\tt -motifList} {\it file} : create the file {\it file} that lists, one per line, each motif file that was generated.  Without this option, it is necessary to interrogate the file system to learn what motifs were predicted.
+\end{itemize}
+
+\section{The cmfinder04 executable}
+
+The {\tt cmfinder04} executable is similar to the {\tt cmfinder} program from CMfinder version 0.3 (see section~\ref{cmfinder03}).
+
+The general command line is:
+\begin{quote}
+{\tt cmfinder04} {\it [options]} {\it seq-file}
+\end{quote}
+where {\it seq-file} is a list of sequences in FASTA format. (Note that there is no longer an output CM file within the command line, in contrast to the version 0.3 program.)
+
+The main options are:
+\begin{itemize}
+\item {\tt -h} : a more comprehensive list of options
+\item {\tt -a} {\it file} : input alignment file, in Stockholm format.  This flag is required.
+\item {\tt -o} {\it file} : output alignment file, in Stockholm format, of the final prediction.
+\item {\tt -{}-degen-keep} : keeps degenerate nucleotides as degenerate, and marginalize where necessary.
+\item {\tt -{}-fragmentary} : model fragmentary RNAs that can arise due to truncated sequences.  Passes appropriate flags to the internal {\tt cmsearch} program, and modifies the calculations of secondary structure appropriately.
+\item {\tt -{}-wgsc} : weight sequences using the GSC algorithm (implemented in Infernal 1.1).  (Can be slow.)
+\item {\tt -{}-column-only-base-pair-probs} : Uses a simpler model in predicting a new secondary structure that treats columns independently (e.g., doesn't use the partition function).  This can sometimes be helpful by usefully complementing predictions done without this flag.
+\item {\tt -{}-filter-non-frag} : before searching for new instances using the internal {\tt cmsearch} program, first run an internal {\tt cmsearch} with Infernal's {\tt -{}-notrunc} flag, and run the main {\tt cmsearch} only on the hits from this pre-search.  Thus, don't consider motif instances that are severely truncated.
+\item {\tt -{}-local} : run the internal {\tt cmsearch} program in local mode.
+\item {\tt -{}-amaa} : run the internal {\tt cmsearch} program with maximal-alignment accuracy.
+\end{itemize}
+
+The {\tt summarize} program from version 0.3 is also implemented within {\tt cmfinder04}.  The main change is that it can use the {\tt -{}-fragmentary} flag, to adjust statistics with fragmented RNAs.  The usage is:
+\begin{quote}
+{\tt cmfinder04 -{}-summarize} {\it input-sto-file}
+\end{quote}
+
+Main flags are:
+\begin{itemize}
+\item {\tt -{}-fragmentary} : take into account fragmentary RNAs.
+\item {\tt -{}-summarize-gsc} : use the GSC algorithm (implemented in Infernal 1.1) to weight sequences.
+\end{itemize}
+
+\chapter{RNAphylo: scoring alignments}
+
+RNAphylo (also previously called ``pscore'') is a program that scores an alignment for evidence of a conserved RNA secondary structure.  It is based on a phylogenetic model using an explicit phylogenetic tree, and its score is a LOD score.  Zizhen Yao's dissertation explains the theory behind RNAphylo as of version 0.3 of this software package \cite{ZizhenThesis}.
+
+Within version 0.4, the main change is to extend RNAphylo to gracefully accept truncated RNAs within the input.
+
+The basic invocation is:
+\begin{quote}
+{\tt RNAphylo} {\it [options]} {\it input-sto-file}
+\end{quote}
+where {\it input-sto-file} is an input alignment in Stockholm format.
+
+Flags that seem to work well, anecdotally:
+\begin{quote}
+{\tt RNAphylo -{}-fragmentary -{}-partition -{}-partition-close-to-fuzzy-limit\\3 -{}-suspicious-degen-nucs 2} {\it input-sto-file}
+\end{quote}
+(There should be a space before the {\tt 3}.)
+
+The main options are:
+\begin{itemize}
+\item {\tt -h} : a more comprehensive list of options
+\item {\tt -{}-fragmentary} : adjust the model to gracefully handle RNAs that are truncated on the $5^\prime$ or $3^\prime$ ends.  Consecutive gaps in the $5^\prime$ or $3^\prime$ ends of a sequence within the alignment are assumed to be truncated.  Implies {\tt -{}-only-ss-cons} and {\tt -{}-degen-is-absent}
+\item {\tt -t} {\it file} : The phylogenetic tree relating the input sequences, in Newick format.  See section~\ref{phyloTree} for more information on where this tree could come from.
+\item {\tt -s} {\it file} : The model for single bases.  The format of this file is not documented.  An example is the file {\tt data/single\_model}
+\item {\tt -p} {\it file} : The model for paired bases.  An example is the file {\tt data/pair\_model}
+\item {\tt -g} {\it file} : The input SCFG grammar file.  The format is not documented.  An example is {\tt data/scfg}
+\item {\tt -{}-partition} : use the partition function in the scoring.
+\item {\tt -{}-degen-is-absent} : model degenerate nucleotide as being absent (holes in the alignment), and don't marginalize.
+\item {\tt -{}-only-ss-cons} : only allow emission of base pairs within the {\tt SS\_cons} line of the input alignment.  This is necessary for {\tt -{}-fragmentary}; without it, we have to remove any pair that has one side in a truncated area, because this is considered absent from the alignment, and then we can't consider the remaining paired nucleotide in the singleton (unpaired) model, because that would be inconsistent, and so the alignment essentially disappears.
+\end{itemize}
+
+\section{The phylogenetic tree input}
+\label{phyloTree}
+
+{\tt RNAphylo} requires a phylogenetic tree as input. The names of the terminal nodes in the phylogenetic tree must be the same as the sequence names within the input alignment.
+
+The file {\tt data/tree.newick} is a phylogenetic tree of vertebrates used to score predicted RNAs in those organisms.  The creation and use of this tree is described in Zizhen Yao's Ph.D. dissertation\cite{ZizhenThesis}.
+
+For use with bacteria, a phylogenetic tree is generally unavailable.  Programs from a version of Pfold \cite{pfold} can be used to infer a phylogenetic tree from the alignment.  To do this:
+\begin{itemize}
+\item The input alignment in Stockholm format must be converted to the ``col'' format, e.g., using the program {\tt pfold-extras/fasta2col}.
+\item The alignment is then processed using the program {\tt pfold-extras/findphyl} with the file {\tt pfold-extras/pscore.rate} as the sole command-line parameter.  See below for more information on this file.
+\item The output of {\tt findphyl} is processed using the program {\tt pfold-extras/mltree} again with {\tt pfold-extras/pscore.rate} as the sole command-line parameter.
+\item This output must then be converted to Newick format, for {\tt RNAphylo}.
+\end{itemize}
+
+The file {\tt data/pscore.rate} is a rate file that can be interpreted by the {\tt findphyl} and {\tt mltree} programs that are part of {\tt pfold-extras}.  The file {\tt data/pscore.rate} is a conversion of RNAphylo's {\tt data/single\_model} file into the format used by programs in {\tt pfold-extras}.
+
+In {\tt data/pscore.rate}, the line of 4 numbers in the section ``Single group'' are the background frequencies of the 4 nucleotides (corresponding to the ``Frequency'' section in {\tt data/single\_model}).  Following those numbers in {\tt data/pscore.rate} are three $4\times 4$ matrices.  If these matrices are $A$, $B$ and $C$ and the ``Rate Matrix'' in the {\tt data/single\_model} file is $M$, then $A$ is the eigenvectors of $M$, $B$ is the diagonal matrix of eigenvalues of $M$ and $C$ is the inverse of $A$.
+
+\chapter{hmmpair: scoring alignments using sequence-only realignment}
+
+\section{Explanation of hmmpair method}
+
+This description of the hmmpair method appears almost verbatim in a paper in preparation as of 2016.
+
+The basic idea of hmmpair is to evaluate covariation in an alignment to see whether the alignment of covarying base pairs is supported by adjacent sequence conservation. To evaluate alignment support, a profile HMM is trained on the alignment. In an alignment with short sequences, the profile HMM might give a high probability of aligning given nucleotides, simply because there are not many other possible alignments. Therefore, we add 200 N nucleotides on both $5^\prime$ and $3^\prime$ sides to each sequence in the alignment. These N nucleotides represent the 4 nucleotides with equal probability.
+
+For each pair of aligned sequences, $S_1$ and $S_2$, and for each consensus base pair, $B$, we determine if the pairs corresponding to $B$ in $S_1$ and $S_2$ are covarying. To covary, the $5^\prime$ nucleotides in pair $B$ in the two sequences must differ, as must the $3^\prime$ nucleotides in pair $B$. Also, the pairs in both sequences must be Watson-Crick or G-U, and degenerate nucleotides (nucleotides other than A, C, G or T/U) are not allowed.
+
+For covarying pairs, we compute a ``support probability'', which measures the extent to which the alignment of the covarying pairs is supported. For both sequences ($S_1$ and $S_2$), we compute the probability of emitting an alignment of that sequence to the profile HMM in which both of its paired nucleotides are placed in their original columns. The overall support probability is the product of the probabilities for each sequence, $S_1$ and $S_2$. The probabilities can be calculated using the HMM forward algorithm. The partition function is also calculated for all sequences in the alignment using code from the ViennaRNA package. The overall support probabilities are multiplied by the probabilities of the two base pairs forming. (This use of the partition function seems to work slightly better than not using it.)
+
+The {\tt hmmpair} score for an alignment is the sum of all support probabilities. (We also considered selecting the maximum of support probabilities, but this method seemed to work slightly less well. We did not try to normalize the sum of support probabilities by the number of sequences.)
+
+The {\tt hmmpair} algorithm explicitly handles the possibility of truncated sequences. It assumes that gap columns within an aligned sequences that are $5^\prime$ to any nucleotides represent a truncation, and not merely a gap (and same thing for $3^\prime$). Base pairs that involve truncated nucleotides are not considered. However, these pairs could not contribute to the score anyway, because the gap character is not consistent with a Watson-Crick or G-U pair.
+
+If paired columns have non-canonical base pairs (i.e., are not Watson-Crick or G-U) in more than 5\% of the sequences, the pair is considered not well conserved. In this case, no support probabilities are calculated for the pair. The frequency of non-canonical pairs is a weighted frequency, where each sequence is weighted according to the GSC algorithm as implemented by the Infernal software package.  (The code is taken from the R2R package \cite{RtoR}.)
+
+In many lineages of bacteria, Rho-independent transcription terminators are common. As expected, their RNA stems exhibit covariation. However, such terminator hairpins are not in themselves interesting in our search for novel RNAs. Any base pair in any sequence that is entirely contained within the stem of a predicted terminator hairpin is ignored, and its support probabilities are not calculated. In this manner, terminator hairpin pairs are ignored in the {\tt hmmpair} score, but other pairs are counted. Note that pairs involving one nucleotide with the terminator hairpin and one outside of it are counted. Such partially overlapping pairs are common mechanisms for gene regulation in cis-regulatory RNAs.
+Note:
+\begin{itemize}
+\item It is not as easy to apply a similar trick to allow RNAphylo to ignore terminators, since RNAphylo operates on all sequences, and only some might have a terminator. Thus, more heuristics are needed to decide when to ignore them. By contrast, the {\tt hmmpair} algorithm naturally operates on pairs of sequences, and it is easier to ignore terminators.
+\item The code in this software package ( CMfinder version \myversion{}) does not implement the predicting of transcription terminators. If a terminator is on the $3^\prime$ end of an alignment, then the {\tt hmmpair} program (within the CMfinder 0.4 package) might not be able to see all of the nucleotides involved in the terminator, and therefore the terminator might not be predicted. In view of this issue, another tool is needed that sees full containing sequences and reports the location of terminator hairpins to the {\tt hmmpair} program.
+\end{itemize}
+
+\section{Using the hmmpair program}
+\label{sec:terminators}
+
+To score an alignment, it might be easiest to use the {\tt ScoreMotif.pl} script (see chapter \ref{sec:ScoreMotif}).
+
+The {\tt hmmpair} command is build in the {\tt hmmpair} directory, and is available as a symbolic link in the {\tt bin} directory.  The command line is as follows:
+\example{
+{\tt hmmpair} {\it sto-file} {\it max-non-canonical-pair-frequency} {\it fragmentary-policy} {\it size-of-poly-N} {\it uniform-ends} {\it terminator-positions-file}
+}
+The parameters are:
+\begin{itemize}
+\item {\it sto-file} : the input alignment file in Stockholm format.
+\item {\it max-non-canonical-pair-frequency} : the maximum frequency of non-canonical base pairs to allow.  Base paired columns that exceed this frequency are ignored in the calculation.  The value {\tt 0.05} is recommended.
+\item {\it fragmentary-policy} : one of the following single-letter values: {\tt d} (disable fragmentary/truncated sequences), {\tt f} (use fragmentary calculations).  The value {\tt f} is recommended.
+\item {\it size-of-poly-N} : the number of ``N'' nucleotides to be added on the $5^\prime$ and $3^\prime$ ends of each sequence in the alignment before folding and determining the partition function.  The value 200 is recommended.
+\item {\it uniform-ends} : sets start/end transitions in profile HMM in a way that didn't help.  The value {\tt 0} (zero) is recommended, which disables this feature.
+\item {\it terminator-positions-file} : can be the text {\tt NULL} to indicate that no transcription terminator predictions are available.  Otherwise, it is a comma-separated file in which each line gives the coordinates of the stem of a terminator.  The first field in the comma-separated line is the sequence accession.  The second and third values are the start and end nucleotide coordinate of the terminator stem.  It does not matter if the terminator is on the sense or antisense strand.
+
+To use this feature, the sequence names in the alignment must be in the Rfam format {\it seqId}{\tt /}{\it start}{\tt -}{\it end} , where {\it seqId} is the sequence accession, {\it start} is the $5^\prime$ nucleotide coordinate of the sequence and {\it end} is the $3^\prime$ end.  Thus, if {\it start} is greater than {\it end}, the sequence is encoded on the reverse complement strand.
+
+An example of a terminator file is {\tt example/848-8255-0-0.emblcsv} , and the associated alignment file is {\tt example/848-8255-0-0.sto}.
+\end{itemize}
+
+{\tt hmmpair} only considers the secondary structure indicated by brackets or parentheses in the \#=GC SS\_cons line.  Motif predictions that include pseudoknots might benefit from an extended version of hmmpair that considers these additional base pairs.
+
+\chapter{ScoreMotif.pl: scoring alignments by combining RNAphylo and hmmpair}
+\label{sec:ScoreMotif}
+
+\section{Background on ScoreMotif.pl}
+
+The script {\tt ScoreMotif.pl} provides additional automation for running the {\tt RNAphylo} and {\tt hmmpair} programs, and calculates a score combining these two programs.  In all cases, higher scores represent more evidence of an RNA.
+
+The method of combining the scores is as follows.  First, the {\tt RNAphylo} and {\tt hmmpair} scores of almost 269,000 alignments were calculated.  Given a new input alignment, {\tt ScoreMotif.pl} calculates the rank index of each score within the almost 269,000 scores.
+
+For example, the file {\tt examples/848-4892-0-0.sto} gets an {\tt hmmpair} score of 2.98024.  This is the 38468th-best score out of the 269,000 alignments. The same example file gets an {\tt RNAphylo} score of {\tt 2.43}, which is the 139706th-best {\tt RNAphylo} score.  Calculating the rank orders is one way of trying to normalize the different scales.
+
+To calculate the combined score, {\tt ScoreMotif.pl} just takes the minimum (better) rank, and then reports the negative of that number.  Thus, in this case, $38468<139706$, so the final combined score is $-38468$.  Taking the negative means that higher scores are better.
+
+\section{Example commands with ScoreMotif.pl}
+
+Running
+\begin{quote}
+{\tt perl bin/ScoreMotif.pl examples/848-4892-0-0.sto}
+\end{quote}
+gives {\tt hmmpair} score 2.98024, {\tt RNAphylo} score {\tt 2.43} and combined score -38468.
+
+Running
+\begin{quote}
+{\tt perl bin/ScoreMotif.pl examples/848-8255-0-0.sto}
+\end{quote}
+gives {\tt hmmpair} score 16.372, {\tt RNAphylo} score {\tt 354.51} and combined score -105.  Note: this command can take about a minute to run.
+
+However, this latter alignment has predicted terminators within the $3^\prime$ hairpin.  Running
+\begin{quote}
+{\tt perl bin/ScoreMotif.pl -terminators examples/848-8255-0-0.emblcsv\\examples/848-8255-0-0.sto}
+\end{quote}
+gives {\tt hmmpair} score 13.4182, {\tt RNAphylo} score {\tt 354.51} (again) and combined score -394.
+
+Adding the {\tt -terminators} flag leads to a poorer {\tt hmmpair} score, because {\tt hmmpair} will ignore the base pairs in the predicted terminators (which is the $3^\prime$ hairpin).  However, even with this reduction, the motif is very good, and indeed corresponds to a MoCo riboswitch.  The use of the {\tt -terminators} flag does not affect the {\tt RNAphylo} score, because it is not as easy to ignore terminators for this program.
+
+\section{Command line for ScoreMotif.pl}
+
+The basic command is:
+\example{
+{\tt perl bin/ScoreMotif.pl} {\it [flags]} {\it sto-file}
+}
+where {\it sto-file} is the input alignment in Stockholm format, and the following flags are recognized:
+\begin{itemize}
+\item {\tt -dataDir} {\it dir} : directory for data files (default: {\tt ../data})
+\item {\tt -rnaphyloDataDir} {\it dir} : directory for RNAphylo data files, which just needs to contain {\tt pscore.rate} (default: same as for {\tt -dataDir})
+\item {\tt -hmmpairDb} {\it file} : the file containing a large number of hmmpair scores in which ScoreMotif.pl should calculate the rank.  The file is made in Perl using the DB\_FILE module with the \$DB\_TREE method, with \$DB\_TREE-$>$\{'compare'\} set to the $<=>$ function. (Default: the file {\tt runid550-scores.score-btree.hmmpair} within the directory specified by {\tt -dataDir})
+\item {\tt -rnaphyloDb} {\it file} : as for {\tt -hmmpairDb}, the file containing scores for RNAphylo (Default: the file {\tt runid550-scores.score-btree.pscore} within the directory specified by {\tt -dataDir})
+\item {\tt -terminators} {\it file} : comma-separated file containing positions of predicted transcription terminators, whose pairs hmmpair should ignore.  The format of this file is explained in section \ref{sec:terminators} under the description of the {\it terminator-positions-file} command line parameter.  (Default: disabled / not set)
+\item {\tt -pfoldRateFile} {\it file} : the rate file for inferring phylogenetic code. (Default: the file {\tt pscore.rate} within the directory specified by {\tt -dataDir})
+\item {\tt -tempBase} {\it path} : a prefix of paths to use to creating temporary files. (Default: {\tt /tmp/}{\it PID} , where {\it PID} is the process ID of the {\tt ScoreMotif.pl} script.
+\item {\tt -pfoldPath} {\it dir} : directory containing executables that are part of a version of Pfold that inferred phylogenetic trees. (Default: same as the directory in which the {\tt ScoreMotif.pl} script is found)
+\item {\tt -hmmpairExe} {\it file} : the executable hmmpair file. (The file {\tt hmmpair} within the same directory as the {\tt ScoreMotif.pl} script)
+\item {\tt -rnaphyloExe} {\it file} : the executable RNAPhylo file (The file {\tt RNAPhylo} within the same directory as the {\tt ScoreMotif.pl} script)
+\end{itemize}
+
+\chapter{Guide to the code}
+
+\section{Guide to the code in cmfinder04}
+
+\subsection{Interface with Infernal 1.1}
+
+A part of the EM-based algorithm of CMfinder requires performing CM searches and creating/using alignments.  Some of these operations essentially translate to running programs within the Infernal 1.1 software package.  For speed and convenience, the relevant programs have been converted so that their ``{\tt main}'' functions can be executed as subroutines within the {\tt cmfinder04} executable.
+
+The source code files {\tt from\_cmbuild.c}, {\tt from\_cmcalibrate.c} and {\tt from\_cmsearch.c} implement this transformation of the Infernal programs {\tt cmbuild}, {\tt cmcalibrate} and {\tt cmsearch}, respectively.
+
+The interface to {\tt cmbuild} is implemented by the function {\tt cmbuild} in {\tt from\_cmbuild.c}.  The interface to {\tt cmsearch} is implemented by the function {\tt cmsearch\_wrapper} in {\tt global.c}.  A partial interface to {\tt cmcalibrate} is implemented by the function {\tt cmcalibrate\_viterbi} in {\tt global.c}.  The use of {\tt cmcalibrate} was an experiment, and is not recommended in general, because it makes {\tt cmfinder04} run much more slowly.
+
+\subsection{Source files}
+
+{\tt cmfinder04} is built from the following source files:
+\begin{itemize}
+\item {\tt cmfinder.c} : has {\tt main} function and functions to process the command line.  After processing the command lines, the main Expectation Maximization loop starts with the first call to {\tt M\_step}.
+\item {\tt cmfinder.h} : {\tt \#include}s most files.
+\item {\tt em.c} : most functions implementing aspects of Expectation Maximization.
+\item {\tt cand.c} and {\tt cand.h} : Various operations on candidates, i.e., predicted instances of a motif within a specific sequence.
+\item {\tt base\_pair\_prediction.c} : Functions related to predicting base pairs, including partition function-based probabilities and mutual information used in the EM algorithm, and statistics computed by the {\tt -{}-summarize} functionality.
+\item {\tt from\_cmbuild.c} : converts the file {\tt cmbuild.c} (from Infernal) to something that can be run as a subroutine.  (See previous section.)
+\item {\tt from\_cmcalibrate.c} : converts the file {\tt cmcalibrate.c} (from Infernal) to something that can be run as a subroutine.  (See previous section.)
+\item {\tt from\_cmsearch.c} : converts the file {\tt cmsearch.c} (from Infernal) to something that can be run as a subroutine.  (See previous section.)
+\item {\tt global.c} : miscellaneous functions, including some functions related to allowing the execution of Infernal programs as subroutines.
+The function {\tt save\_and\_load\_CM\_via\_memory\_copying} implements a hack that simulates allows a CM to be re-used for multiple searches, circumventing a sanity check that makes sense in the context of how Infernal's code is supposed to be used.
+\end{itemize}
+
+\section{Guide to the code in RNAphylo}
+
+Note that the term ``absent'' refers to nucleotides that are unknown because they are degenerate or because they are truncated.  In most cases, ``absent'' nucleotides are treated as holes in the alignment.  (In other words, they are considered as never having been present.  In contrast, a more typical formulation is to consider them as missing information that must be inferred in a Bayesian manner.)
+
+RNAphylo is made up of the following source files:
+\begin{itemize}
+\item {\tt RNAphylo.c} : The {\tt main} function is here, and this function drives most of the calculation, after processing the command line and initializing variables.  The calculation proper starts after the line
+\begin{quote}
+{\tt //Conserved singlet model}
+\end{quote}
+\item {\tt phytree.c} and {\tt phytree.h} : Functions for actually processing the phylogenetic calculations, including calls to QRNA functions to manipulate rate matrices.
+\item {\tt my\_matrix.c} and {\tt my\_matric.h} : generic matrix calculations (i.e., not specific to rate matrices).
+\item {\tt grammar.c} and {\tt grammar.h} : processing of the SCFG, including loading/saving, and dynamic-programming calculations.
+\item {\tt global.c} and {\tt global.h} : miscellaneous functions.
+\item {\tt get\_tm\_freq\_cache.cpp} : implements caching of rate matrix calculations, which are frequently repeated.  This file is implemented in C++, because of the convenience of STL classes like {\tt map} for implementing the cache.  Note: although it's referred to as a cache, cached information is never evicted.
+\end{itemize}
+
+\section{Guide to the code in hmmpair}
+
+For historical reasons, hmmpair is linked against code from Vienna RNA version 1.7.1, while the CMfinder and RNAphylo programs are linked against Vienna RNA version 1.4.
+
+The source files are as follows:
+\begin{itemize}
+\item {\tt AlignmentConsensusAndScoring.cpp} : This is the most important code for implementing the hmmpair method.  The function {\tt HmmForwardScore\_SS} is the main entry point.  The struct {\tt DegappedSeqFromMsa} deals with de-gapping the input aligned sequences, adding flanking poly-N sequences, and maintains maps between the positions in the input alignment and positions in the de-gapped sequences.  The class {\tt PartitionFunctionLookup} creates a lookup table to store base-pairing probabilities using the partition function implemented by the Vienna RNA library.  The class {\tt PositionsToIgnore} implements the logic to ignore base pairs within predicted Rho-independent transcription terminator hairpins.  The function {\tt DetermineSeqBoundsForFragmentary} handles aspects of truncated sequences.  The function {\tt HmmForwardScore\_SS\_MakeHmm} makes a profile HMM that will be used to analyze the alignment.
+\item {\tt GSCConsensus.cpp} : this source file calculates consensus information from the alignment after weighting sequences according to the GSC algorithm.  The method was previously used by the R2R program \cite{RtoR}, and the source code is largely identical to a source file from R2R.
+\item {\tt hmmpair.cpp} : contains the {\tt main} function, parses command line, and has a few utility functions.
+\item {\tt Cm2HMM.cpp} : code for converting CMs into profile HMMs.  Only some of the code in this file and the files below is actually used.  The code is from the {\sc RaveNnA} package \cite{zashaRECOMB,zashaISMB,zasha06}.
+\item {\tt Cm2HmmOptimize.cpp} : code for optimization of converted profile HMMs.
+\item {\tt CommaSepFileReader.cpp} : code to read comma-separated files.
+\item {\tt CovarianceModel.cpp} : a class that wraps the CM structure implemented by Infernal.
+\item {\tt InfernalHmm.cpp} : a class that partly implements profile HMMs based on the Infernal code for CMs.
+\item {\tt HmmType1.cpp} : a profile HMM class that is faster to use for scanning.
+\item {\tt MarkovModelStats.cpp} : implements Markov models.
+\item {\tt MiscExceptions.cpp} : utilities related to C++ exceptions.
+\item {\tt MLHeuristic.cpp} : code related to the Maximum-Likelihood (ML) heuristic for setting profile HMM transition scores based on a CM \cite{zashaRECOMB}.
+\item {\tt NaryCounter.cpp} : counts in an arbitrary numeric base.
+\item {\tt NoUnderflowDouble.h} : A numeric class that uses extra bits for exponents to avoid underflow errors.
+\item {\tt Optimize.cpp} : code for numeric optimization.
+\item {\tt ScanHmm.cpp} : implements Viterbi and forward algorithms for profile HMMs of various flavors.
+\item {\tt SymbolicMath.cpp} : implements a numerical type that is a symbolic expression.
+\end{itemize}
+
+\bibliographystyle{abbrv}
+\bibliography{bio}
+
+\end{document}
+
+% [zw49@compute-9-2 runs]$ perl /home/zw49/software/cmfinder/hmmpair/bin/ScoreMotif.pl -rnaphyloDataDir ~/software/cmfinder/pscore/data -pfoldPath ~/software/cmfinder/pscore/pfold-extras -hmmpairExe /home/zw49/software/cmfinder/hmmpair/src/hmmpair -pfoldRateFile /home/zw49/software/cmfinder/pscore/data/pscore.rate -rnaphyloExe ~/software/cmfinder/pscore/pscore/RNAPhylo 848-4892-0-0.sto

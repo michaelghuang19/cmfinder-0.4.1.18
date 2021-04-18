@@ -1,0 +1,29 @@
+CMfinder - Covariance Model Based RNA Motif Finder
+
+Copyright (C) 2001-2006 University of Washington, Seattle
+
+This software package is free software. You can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
+
+In other words, you may modify, copy, or redistribute this source code
+and its documentation, but if you do, you must preserve all these
+copyrights and distribute all derivative versions as free software
+under the GNU General Public License.
+
+This software is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this software, in the file LICENSE; if not, write to the
+Free Software Foundation, Inc., 675 Mass. Ave, Cambridge, MA 02139
+USA or see http://www.gnu.org/
+
+Note that the packages "vienna" and "infernal" have their own copyright 
+attached. 
+
+
+

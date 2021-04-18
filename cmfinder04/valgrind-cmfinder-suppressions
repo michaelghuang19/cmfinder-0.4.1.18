@@ -1,0 +1,146 @@
+{
+   SSE1
+   Memcheck:Addr8
+   fun:__strspn_sse42
+   fun:esl_strtok_adv
+}
+{
+   SSE2
+   Memcheck:Cond
+   fun:__strspn_sse42
+   fun:esl_strtok_adv
+}
+{
+   strtok1
+   Memcheck:Value8
+   fun:esl_strtok_adv
+   fun:esl_fileparser_GetTokenOnLine
+}
+{
+   strtok2
+   Memcheck:Value8
+   fun:strcspn
+   fun:esl_strtok_adv
+   fun:esl_fileparser_GetTokenOnLine
+}
+{
+   strtok3
+   Memcheck:Value8
+   fun:esl_fileparser_GetTokenOnLine
+}
+{
+   readcm1
+   Memcheck:Cond
+   fun:is_real
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm2
+   Memcheck:Value8
+   fun:is_real
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm2
+   Memcheck:Value8
+   fun:ascii2prob
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm3
+   Memcheck:Value8
+   fun:____strtod_l_internal
+   fun:ascii2prob
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm4
+   Memcheck:Cond
+   fun:____strtod_l_internal
+   fun:ascii2prob
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm5
+   Memcheck:Value8
+   fun:str_to_mpn
+   fun:____strtod_l_internal
+   fun:ascii2prob
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm6
+   Memcheck:Value8
+   fun:str_to_mpn
+   fun:____strtod_l_internal
+   fun:ascii2prob
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm7
+   Memcheck:Cond
+   fun:__strspn_sse42
+   fun:esl_strtok_adv
+   fun:esl_fileparser_GetTokenOnLine
+   fun:read_asc30hmm
+   fun:p7_hmmfile_Read
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm8
+   Memcheck:Value8
+   fun:esl_strtok_adv
+   fun:esl_fileparser_GetTokenOnLine
+}
+{
+   readcm9
+   Memcheck:Value8
+   fun:strcspn
+   fun:esl_strtok_adv
+}
+{
+   readcm10
+   Memcheck:Value8
+   fun:esl_fileparser_GetTokenOnLine
+   fun:read_asc30hmm
+   fun:p7_hmmfile_Read
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm11
+   Memcheck:Value8
+   fun:read_asc30hmm
+   fun:p7_hmmfile_Read
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm12
+   Memcheck:Value8
+   fun:____strtod_l_internal
+   fun:read_asc30hmm
+   fun:p7_hmmfile_Read
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm13
+   Memcheck:Cond
+   fun:____strtod_l_internal
+   fun:read_asc30hmm
+   fun:p7_hmmfile_Read
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   readcm14
+   Memcheck:Value8
+   fun:str_to_mpn
+   fun:____strtod_l_internal
+   fun:read_asc30hmm
+   fun:p7_hmmfile_Read
+   fun:read_asc_1p1_cm__with_RAM
+}
+{
+   x15
+   Memcheck:Value8
+   fun:____strtod_l_internal
+   fun:ascii2prob
+}

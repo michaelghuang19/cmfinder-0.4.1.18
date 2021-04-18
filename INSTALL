@@ -1,0 +1,5 @@
+please see user-manual.pdf for installation instructions.
+
+note: this package is installed in-place.
+use ./configure ; make
+BUT NOT make install

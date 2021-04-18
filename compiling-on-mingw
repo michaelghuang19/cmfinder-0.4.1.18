@@ -1,0 +1,40 @@
+
+------------------
+starting the shell
+
+Run the msys shell in Windows Start, e.g.:
+c:\MinGW\msys\1.0\bin\bash.exe
+
+Set up paths, e.g.:
+export PATH=/c/MinGW/bin:/c/MinGW/msys/1.0/bin:/c/Windows/system32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:.:/c/wxWidgets-2.9.5/lib/gcc_dll
+
+-------------------------
+configuring & building
+
+CPPFLAGS="-DSRE_STRICT_ANSI -O0 -g"  CFLAGS="-DSRE_STRICT_ANSI -O0 -g" ./configure --disable-threads
+
+note:
+- ***** make sure depcomp is _not_ a sym link.  copy it as a file, or msys won't know how to execute it. (Might not be necessary on distributions made using perl package.pl)
+- apparently when I add -DSRE_STRICT_ANSI , then the configure script --enable-debugging flag has no effect, so if I want debugging, I'll have to add it to the command line manually.
+- SRE_STRICT_ANSI: forces squid to avoid some functionality that would lead to compiling problems.  (There is only C++ source file, so we also need CPPFLAGS set.)
+- threads: Some parts of HMMER will not compile with threads enabled, without additional work, so it's easiest to just disable threads.
+
+
+-----------------------
+make clean
+
+after doing 'make clean', manually remove the hmmer/src/impl directory.  (The configure scripts expects it to be a symbolic link, but MinGW makes it an actual directory.)
+
+In the git repository, the path is this:
+
+make clean ; rm -r CMfinder/lib-infernal-1.1/hmmer/src/impl
+
+In a released package, it's:
+
+make clean ; rm -r lib-infernal-1.1/hmmer/src/impl
+
+
+-----------
+Notes:
+- in Easel, I made some changes to easel.c and esl_buffer.c to hide additional code within #ifdef _POSIX_VERSION
+- there are lots of warnings, and I suspect some functionality won't work

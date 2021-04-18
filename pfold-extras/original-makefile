@@ -1,0 +1,112 @@
+BINPATH = .
+
+all:		$(BINPATH)/addparen $(BINPATH)/col2fasta $(BINPATH)/col2newick $(BINPATH)/col2psalign $(BINPATH)/col2txtalign $(BINPATH)/drawdot $(BINPATH)/drawphyl $(BINPATH)/extendstem $(BINPATH)/findphyl $(BINPATH)/mltree $(BINPATH)/newick2col $(BINPATH)/nohead $(BINPATH)/scfg $(BINPATH)/scfg_slow $(BINPATH)/stdpair 
+
+
+$(BINPATH)/addparen:	addparen.c col.o file.o llist.o graph.o
+			gcc -O3 -o $(BINPATH)/addparen addparen.c col.o file.o llist.o graph.o
+
+$(BINPATH)/col2fasta:	col2fasta.c col.o file.o llist.o
+			gcc -O3 -o $(BINPATH)/col2fasta col2fasta.c col.o file.o llist.o
+
+$(BINPATH)/col2newick:	col2newick.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o
+			gcc -O3 -o $(BINPATH)/col2newick col2newick.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o -lm
+
+$(BINPATH)/col2psalign:	col2psalign.c col.o file.o llist.o
+			gcc -O3 -o $(BINPATH)/col2psalign col2psalign.c col.o file.o llist.o
+
+$(BINPATH)/col2txtalign:	col2txtalign.c col.o file.o llist.o
+				gcc -O3 -o $(BINPATH)/col2txtalign col2txtalign.c col.o file.o llist.o
+
+$(BINPATH)/drawphyl:	drawphyl.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o
+			gcc -O3 -o $(BINPATH)/drawphyl drawphyl.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o -lm
+
+$(BINPATH)/extendstem:	extendstem.c col.o file.o llist.o rna.o
+			gcc -O3 -o $(BINPATH)/extendstem extendstem.c col.o file.o llist.o rna.o
+
+$(BINPATH)/findphyl:	findphyl.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o
+			gcc -O3 -o $(BINPATH)/findphyl findphyl.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o -lm
+
+$(BINPATH)/newick2col:  newick2col.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o
+			gcc -O3 -o $(BINPATH)/newick2col newick2col.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o -lm
+
+$(BINPATH)/nohead:   	nohead.c col.o file.o llist.o
+			gcc -O3 -o $(BINPATH)/nohead nohead.c col.o file.o llist.o
+
+$(BINPATH)/stdpair:	stdpair.c col.o file.o llist.o rna.o
+			gcc -O3 -o $(BINPATH)/stdpair stdpair.c col.o file.o llist.o rna.o
+
+
+$(BINPATH)/drawdot:	drawdot.c file.o llist.o
+			gcc -O3 -o $(BINPATH)/drawdot drawdot.c file.o llist.o
+
+$(BINPATH)/scfg:	scfg.c phyl.o matrix.o col.o file.o llist.o grammar.o newcolprob.o edouble.o inout.o optimize.o align.o search.o
+			gcc -O3 -o $(BINPATH)/scfg scfg.c phyl.o matrix.o col.o file.o llist.o grammar.o newcolprob.o edouble.o inout.o optimize.o align.o search.o -lm
+
+$(BINPATH)/scfg_slow:	scfg.c phyl.o matrix_slow.o col.o file.o llist.o grammar_slow.o newcolprob_slow.o edouble_slow.o inout_slow.o optimize.o align.o search.o
+			gcc -O3 -o $(BINPATH)/scfg_slow scfg.c phyl.o matrix_slow.o col.o file.o llist.o grammar_slow.o newcolprob_slow.o edouble_slow.o inout_slow.o optimize.o align.o search.o -lm
+
+
+$(BINPATH)/mltree:	mltree.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o
+			gcc -O3  -o $(BINPATH)/mltree mltree.c file.o llist.o phyl.o grammar.o optimize.o col.o align.o matrix.o edouble.o -lm
+
+
+align.o:	align.c align.h file.o
+		gcc -O3 -c align.c
+
+col.o:		col.c col.h file.o
+		gcc -O3 -c col.c
+
+edouble.o:	edouble.c edouble.h file.o
+		gcc -O3 -c edouble.c
+
+edouble_slow.o:	edouble.c edouble.h file.o
+		gcc -O3 -DETYPE=EDBL -o edouble_slow.o -c edouble.c
+
+file.o: 	file.c file.h
+		gcc -O3 -c file.c
+
+graph.o:	graph.c graph.h
+		gcc -O3 -c graph.c
+
+grammar.o:	grammar.c grammar.h
+		gcc -O3 -c grammar.c
+
+grammar_slow.o:	grammar.c grammar.h
+		gcc -O3 -DETYPE=EDBL -o grammar_slow.o -c grammar.c
+
+inout.o:	inout.c inout.h
+		gcc -O3 -c inout.c
+
+inout_slow.o:	inout.c inout.h
+		gcc -O3  -DETYPE=EDBL -o inout_slow.o -c inout.c
+
+llist.o: 	llist.c llist.h
+		gcc -O3 -c llist.c
+
+matrix.o:	matrix.c matrix.h file.o
+		gcc -O3 -c matrix.c
+
+matrix_slow.o:	matrix.c matrix.h file.o
+		gcc -O3 -DETYPE=EDBL -o matrix_slow.o -c matrix.c
+
+newcolprob.o:	newcolprob.c newcolprob.h phyl.o llist.o col.o matrix.o edouble.o search.o
+		gcc -O3 -c newcolprob.c
+
+newcolprob_slow.o:	newcolprob.c newcolprob.h phyl.o llist.o col.o matrix.o edouble_slow.o search.o
+		gcc -O3 -DETYPE=EDBL -o newcolprob_slow.o -c newcolprob.c
+
+optimize.o:	optimize.c optimize.h
+		gcc -O3 -c optimize.c
+
+phyl.o:		phyl.c phyl.h
+		gcc -O3 -c phyl.c
+
+rna.o:		rna.c rna.h
+		gcc -O3 -c rna.c
+
+search.o:	search.c search.h
+		gcc -O3 -c search.c
+
+clean:
+		rm *~ *.o core

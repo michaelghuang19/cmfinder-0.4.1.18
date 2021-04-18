@@ -1,0 +1,81 @@
+#Makefile for CMfinder
+#Dec, 2004
+#
+BINDIR      = ../bin
+
+# stuff from another Makefile.in file
+top_srcdir = @top_srcdir@
+srcdir     = @srcdir@
+VPATH      = @srcdir@ 
+SHELL      = /bin/sh
+
+prefix      = @prefix@
+exec_prefix = @exec_prefix@
+# datarootdir = @datarootdir@
+bindir      = @bindir@
+libdir      = @libdir@
+includedir  = @includedir@
+mandir      = @mandir@
+docdir      = @docdir@
+pdfdir      = @pdfdir@
+mandir      = @mandir@
+man1dir     = ${mandir}/man1
+man1ext     = .1
+
+CC        = @CC@
+CFLAGS    = @CFLAGS@ @PTHREAD_CFLAGS@
+SIMDFLAGS = @SIMD_CFLAGS@
+CPPFLAGS  = @CPPFLAGS@
+LDFLAGS   = @LDFLAGS@
+DEFS      = @DEFS@
+
+AR        = @AR@ 
+RANLIB    = @RANLIB@
+INSTALL   = @INSTALL@
+
+LIBS  = -linfernal -lsquid -leasel -lvienna @LIBS@ -lm
+
+INFERNAL_DIR=@top_srcdir@/@INFERNAL07_SRCDIR@
+EASEL_DIR=@top_srcdir@/@INFERNAL07_EASELDIR@
+SQUID_DIR=@top_srcdir@/@INFERNAL07_SQUIDDIR@
+VIENNA_DIR=@top_srcdir@/@VIENNA_DIR@
+
+LIBDIRS=-L${INFERNAL_DIR} -L${EASEL_DIR} -L${SQUID_DIR} -L${VIENNA_DIR}
+INCDIRS=-I${INFERNAL_DIR} -I${EASEL_DIR} -I${SQUID_DIR} -I${VIENNA_DIR} -I.
+
+PROGS = candf cands canda align cluster count_seq
+
+all : cmfinder summarize $(PROGS) diff_motif
+
+MYOBJS  = cand.o match_constr.o global.o histogram.o
+
+$(PROGS): %: %.o $(MYOBJS) 	
+	$(CC) $(CFLAGS) $(MDEFS) ${LIBDIRS} -o $@ $@.o $(MYOBJS) ${SQUID_DIR}/iupac.o ${SQUID_DIR}/dayhoff.o $(LIBS)
+
+diff_motif : %: %.o
+	$(CC) $(CFLAGS) $(MDEFS) ${LIBDIRS} -o $@ $@.o $(LIBS)
+
+cmfinder: %: %.o $(MYOBJS) em.o automaker.o	
+	$(CC) $(CFLAGS) $(MDEFS) ${LIBDIRS} -o $@ $@.o $(MYOBJS) automaker.o em.o ${SQUID_DIR}/iupac.o ${SQUID_DIR}/dayhoff.o $(LIBS)
+
+
+summarize: %: %.o $(MYOBJS) automaker.o	
+	$(CC) $(CFLAGS) $(MDEFS) ${LIBDIRS} -o $@ $@.o $(MYOBJS) automaker.o ${SQUID_DIR}/iupac.o ${SQUID_DIR}/dayhoff.o $(LIBS)
+
+
+refine: %: %.o $(MYOBJS) automaker.o
+	$(CC) $(CFLAGS) $(MDEFS) ${LIBDIRS} -o $@ $@.o $(MYOBJS) automaker.o ${SQUID_DIR}/iupac.o ${SQUID_DIR}/dayhoff.o $(LIBS)
+
+install: $(PROGS) cmfinder summarize 
+	cp $(PROGS) cmfinder summarize $(BINDIR)/
+
+distclean : clean extradistclean
+
+extradistclean :
+	-rm -f Makefile
+
+clean:
+	-rm -f core.* *.o *~ *.Addrs *.Counts *.pixie Makefile.bak core $(PROGS) TAGS
+
+.c.o:
+	$(CC) $(CFLAGS) $(MDEFS)  ${INCDIRS} -c $<		

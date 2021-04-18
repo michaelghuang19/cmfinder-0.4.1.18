@@ -1,0 +1,31 @@
+
+was upgrading to infernal-1.1.2.
+however, I've decided the diffs	in	cm_pipeline.c and cmsearch.c	are too	complic\
+ated, and I should give	up.  I'll keep CMfinder	the way	it is, and not upgrade \
+to infernal-1.1.2.  I'll make a	new version of infernal	within motifs_2007 that\
+ has just the easy to implement --stop-file and --print-env and	whatever flags,\
+ but hopefully has some	good bug fixes.
+
+
+
+files that I've changed:
+
+1.1.2-DONE esl_stopwatch.c : minor.  master->elapsed += w->elapsed;
+
+1.1.2-DONE cmbuild.c : ?? /* set to calibrate everything */
+
+1.1.2-DONE cmcalibrate.c
+
+1.1.2-DONE cm_p7_modelmaker.c
+
+>>> cm_pipeline.c
+
+>>> cmsearch.c
+
+1.1.2-DONE infernal.h : #define WITHIN_CMFINDER, cm_p7_Calibrate
+
+diff command that excludes irrelevant differences in files
+
+diff -b --exclude "aclocal.m4" --exclude INSTALL --exclude RELEASE-NOTES --exclude "*.pl"  --exclude "Makefile*" --exclude "*.o" --exclude "*.a" --exclude "*.tex" --exclude "*.man" --exclude "configure" --ignore-matching-lines "Version [0-9i]" --ignore-matching-lines "Copyright " --ignore-matching-lines "HMMER - Biological" --ignore-matching-lines "Infernal - inference of" --ignore-matching-lines "is distributed under the terms"  --ignore-matching-lines "SVN .Id" -r infernal-1.1 infernal-1.1.2|less
+
+

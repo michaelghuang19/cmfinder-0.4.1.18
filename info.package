@@ -1,0 +1,41 @@
+packageName	cmfinder
+packageVersion	git
+packageVersionVariable	CMFINDER_PACKAGE_VERSION
+autoreconfCommandList	autoconf	automake --add-missing --copy	autoconf
+
+# files that get edited with packageVersionVariable
+editFileList	configure.ac	CMfinder/cmfinder_inf11/cmfinder.c	pscore/pscore/RNAPhylo.c	CMfinder/bin/cmfinder_inf11.pl
+editFileList	user-manual/user-manual.tex
+
+noCopyFileList	pscore/msdev-pscore	codelite-workspace	pscore/pscore.training.tgz	CMfinder/msdev-cmfinder	CMfinder/msdev-infernal-1.1-lib	missing	depcomp
+
+# linkDir	targetDir	file-list
+symLinkFileList	bin	cmfinder03	align	canda	candf	cands	cluster	cmfinder	count_seq	summarize	diff_motif
+symLinkFileList	bin	cmfinder04	cmfinder04
+symLinkFileList	bin	RNAPhylo	RNAPhylo
+symLinkFileList	bin	lib-infernal-0.7/squid	sreformat
+symLinkFileList	bin	pfold-extras	fasta2col	findphyl	mltree
+symLinkFileList	bin	clustalw1.83	clustalw
+symLinkFileList	bin	hmmpair	hmmpair
+
+# srcPath	destPath	configure.ac variable name (if any)
+pathChangeList	CMfinder/bin/cmfinder_inf11.pl	bin/cmfinder04.pl
+pathChangeList	CMfinder/bin	bin
+pathChangeList	CMfinder/cmfinder_inf11	cmfinder04	CMFINDER04_DIR	# BTW, it's important that this comes before 'CMfinder/cmfinder' since that's a prefix of this dir
+pathChangeList	CMfinder/cmfinder	cmfinder03	CMFINDER03_DIR
+pathChangeList	CMfinder/data	data
+pathChangeList	CMfinder/easel	lib-infernal-0.7/easel	INFERNAL07_EASELDIR
+pathChangeList	CMfinder/squid	lib-infernal-0.7/squid	INFERNAL07_SQUIDDIR
+pathChangeList	CMfinder/infernal	lib-infernal-0.7/src	INFERNAL07_SRCDIR
+pathChangeList	CMfinder/lib-infernal-1.1	lib-infernal-1.1	INFERNAL11_DIR
+pathChangeList	CMfinder/vienna14	lib-vienna-1.4	VIENNA_DIR
+pathChangeList	CMfinder/vienna171	lib-vienna-1.7.1	VIENNA171_DIR
+pathChangeList	pscore/data	data
+pathChangeList	pscore/pscore	RNAPhylo	PSCORE_DIR
+pathChangeList	pscore/qrna	lib-qrna	QRNA_DIR
+pathChangeList	pscore/pfold-extras	pfold-extras	PFOLD_DIR
+pathChangeList	hmmpair/data	data
+pathChangeList	hmmpair/src	hmmpair	HMMPAIR_DIR
+pathChangeList	hmmpair/bin	bin
+
+userManualFile	user-manual	user-manual
