@@ -328,7 +328,7 @@ if (!$simpleMotifsAlreadyDone) {
 	    RunCmd($job->{cands});
 	}
     }
-
+		print "file name $tempFileListFileName\n";
     push @cands,GetCandFiles("$tempFileListFileName.single$outFileSuffix");
     push @cands,GetCandFiles("$tempFileListFileName.double$outFileSuffix");
 }
